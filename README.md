@@ -132,4 +132,4 @@ Ensure that the following tools are installed:
 Clone the repository using Git:
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/khamismgofi-web/E-Commerce-task4.git>
