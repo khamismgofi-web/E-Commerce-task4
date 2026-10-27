@@ -67,3 +67,8 @@ const getProducts = asyncHandler(async (req, res) => {
 
   res.json({ products, page, pages: Math.ceil(total / limit), total });
 });
+
+const getCategories = asyncHandler(async (req, res) => {
+  const categories = await Product.distinct('category');
+  res.json(categories.sort());
+});
