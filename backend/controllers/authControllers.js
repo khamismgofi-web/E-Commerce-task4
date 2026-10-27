@@ -21,3 +21,20 @@ const userResponse = (user) => ({
   role: user.role,
   token: signToken(user._id),
 });
+
+const register = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (![name, email, password].every(isNonEmptyString)) {
+    throw httpError(400, 'Name, email and password are required');
+  }
+
+  const normalizedEmail = normalizeEmail(email);
+  const existing = await User.findOne({ email: normalizedEmail });
+  if (existing) {
+    throw httpError(409, 'Email is already registered');
+  }
+
+  const user = await User.create({ name, email: normalizedEmail, password });
+  res.status(201).json(userResponse(user));
+});
