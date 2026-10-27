@@ -37,3 +37,5 @@ const adminOnly = (req, res, next) => {
   }
   throw httpError(403, 'Admin access only');
 };
+
+module.exports = { protect, adminOnly };
