@@ -104,3 +104,12 @@ const deleteProduct = asyncHandler(async (req, res) => {
   await product.deleteOne();
   res.json({ message: 'Product removed' });
 });
+
+module.exports = {
+  getProducts,
+  getCategories,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};
