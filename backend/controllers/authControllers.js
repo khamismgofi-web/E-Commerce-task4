@@ -57,3 +57,5 @@ const login = asyncHandler(async (req, res) => {
 const getMe = asyncHandler(async (req, res) => {
   res.json(req.user);
 });
+
+module.exports = { register, login, getMe };
