@@ -3,3 +3,4 @@ const httpError = (statusCode, message) => {
   error.statusCode = statusCode;
   return error;
 };
+module.exports = httpError;
