@@ -46,3 +46,5 @@ const orderSchema = new mongoose.Schema(
 );
 
 orderSchema.statics.STATUSES = ORDER_STATUSES;
+
+module.exports = mongoose.model('Order', orderSchema);
