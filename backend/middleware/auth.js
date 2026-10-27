@@ -30,3 +30,10 @@ const protect = asyncHandler(async (req, res, next) => {
   req.user = user;
   next();
 });
+
+const adminOnly = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    return next();
+  }
+  throw httpError(403, 'Admin access only');
+};
