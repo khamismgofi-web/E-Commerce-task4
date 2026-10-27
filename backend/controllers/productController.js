@@ -80,3 +80,8 @@ const getProductById = asyncHandler(async (req, res) => {
   }
   res.json(product);
 });
+
+const createProduct = asyncHandler(async (req, res) => {
+  const product = await Product.create(pickFields(req.body));
+  res.status(201).json(product);
+});
