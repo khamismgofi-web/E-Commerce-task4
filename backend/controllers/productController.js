@@ -13,3 +13,5 @@ const pickFields = (body) =>
     }
     return result;
   }, {});
+  
+  const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
