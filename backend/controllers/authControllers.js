@@ -38,3 +38,18 @@ const register = asyncHandler(async (req, res) => {
   const user = await User.create({ name, email: normalizedEmail, password });
   res.status(201).json(userResponse(user));
 });
+
+const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!isNonEmptyString(email) || !isNonEmptyString(password)) {
+    throw httpError(400, 'Email and password are required');
+  }
+
+  const user = await User.findOne({ email: normalizeEmail(email) }).select('+password');
+  if (!user || !(await user.matchPassword(password))) {
+    throw httpError(401, 'Invalid email or password');
+  }
+
+  res.json(userResponse(user));
+});
