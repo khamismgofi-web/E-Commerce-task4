@@ -95,3 +95,12 @@ const updateProduct = asyncHandler(async (req, res) => {
   await product.save();
   res.json(product);
 });
+
+const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    throw httpError(404, 'Product not found');
+  }
+  await product.deleteOne();
+  res.json({ message: 'Product removed' });
+});
