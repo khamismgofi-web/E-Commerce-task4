@@ -2,3 +2,22 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const httpError = require('../utils/httpError');
+
+const DEFAULT_TOKEN_LIFETIME = '7d';
+
+const isNonEmptyString = (value) => typeof value === 'string' && value.trim() !== '';
+
+const normalizeEmail = (email) => email.trim().toLowerCase();
+
+const signToken = (id) =>
+  jwt.sign({ id: String(id) }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || DEFAULT_TOKEN_LIFETIME,
+  });
+
+const userResponse = (user) => ({
+  _id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  token: signToken(user._id),
+});
