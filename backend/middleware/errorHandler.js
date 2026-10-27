@@ -24,3 +24,10 @@ const errorHandler = (err, req, res, next) => {
     status = 400;
     message = 'Request body is not valid JSON';
   }
+   if (status === 500) {
+    console.error(err);
+    message = 'Server error';
+  }
+
+  res.status(status).json({ message });
+};
