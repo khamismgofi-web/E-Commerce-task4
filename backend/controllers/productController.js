@@ -72,3 +72,11 @@ const getCategories = asyncHandler(async (req, res) => {
   const categories = await Product.distinct('category');
   res.json(categories.sort());
 });
+
+const getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    throw httpError(404, 'Product not found');
+  }
+  res.json(product);
+});
