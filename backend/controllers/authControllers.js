@@ -53,3 +53,7 @@ const login = asyncHandler(async (req, res) => {
 
   res.json(userResponse(user));
 });
+
+const getMe = asyncHandler(async (req, res) => {
+  res.json(req.user);
+});
