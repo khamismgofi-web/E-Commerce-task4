@@ -52,3 +52,18 @@ const buildProductFilter = ({ keyword, category, minPrice, maxPrice }) => {
 
   return filter;
 };
+const getProducts = asyncHandler(async (req, res) => {
+  const filter = buildProductFilter(req.query);
+  const page = parsePositiveInt(req.query.page, 1);
+  const limit = Math.min(parsePositiveInt(req.query.limit, DEFAULT_LIMIT), MAX_LIMIT);
+
+  const [total, products] = await Promise.all([
+    Product.countDocuments(filter),
+    Product.find(filter)
+      .sort({ createdAt: -1, _id: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit),
+  ]);
+
+  res.json({ products, page, pages: Math.ceil(total / limit), total });
+});
