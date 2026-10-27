@@ -85,3 +85,13 @@ const createProduct = asyncHandler(async (req, res) => {
   const product = await Product.create(pickFields(req.body));
   res.status(201).json(product);
 });
+
+const updateProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    throw httpError(404, 'Product not found');
+  }
+  Object.assign(product, pickFields(req.body));
+  await product.save();
+  res.json(product);
+});
