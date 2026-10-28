@@ -242,3 +242,8 @@ async function main() {
 
   console.log(`\nAll ${passed} steps passed.`);
 }
+
+main().catch((error) => {
+  console.error(`\nFAIL  ${error.message}`);
+  process.exit(1);
+});
