@@ -5,6 +5,7 @@ const User = require('./models/User');
 const Product = require('./models/Product');
 const Cart = require('./models/Cart');
 
+const img = (name) => `https://picsum.photos/seed/${name}/400/300`;
 
 const products = [
   {
