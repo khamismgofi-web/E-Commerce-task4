@@ -98,3 +98,33 @@ async function runCatalogueSteps(ctx) {
     assert.equal(badPrice.status, 400);
   });
 }
+
+async function runCartSteps(ctx) {
+  const { product, stockBefore, token } = ctx;
+
+  await step('cart requires login', async () => {
+    const r = await call('GET', '/cart');
+    assert.equal(r.status, 401);
+  });
+
+  await step('add a product to the cart', async () => {
+    const body = { productId: product._id, quantity: 2 };
+    const r = await call('POST', '/cart', body, token);
+    assert.equal(r.status, 201);
+    assert.equal(r.data.items.length, 1);
+    assert.equal(r.data.items[0].quantity, 2);
+  });
+
+  await step('adding more than the stock is rejected', async () => {
+    const body = { productId: product._id, quantity: stockBefore + 1 };
+    const r = await call('POST', '/cart', body, token);
+    assert.equal(r.status, 400);
+  });
+
+  await step('update the cart quantity', async () => {
+    const r = await call('PUT', `/cart/${product._id}`, { quantity: 1 }, token);
+    assert.equal(r.status, 200);
+    assert.equal(r.data.items[0].quantity, 1);
+    assert.equal(r.data.total, roundMoney(product.price));
+  });
+}
