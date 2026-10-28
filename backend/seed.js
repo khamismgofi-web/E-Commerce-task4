@@ -128,3 +128,11 @@ const seed = async () => {
   console.log(`Seeded ${products.length} products.`);
   console.log(`Admin login: ${adminEmail} / ${adminPassword}`);
 };
+
+seed()
+  .then(() => mongoose.disconnect())
+  .catch(async (error) => {
+    console.error('Seeding failed:', error.message);
+    await mongoose.disconnect();
+    process.exit(1);
+  });
