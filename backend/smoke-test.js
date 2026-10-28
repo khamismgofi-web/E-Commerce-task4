@@ -75,3 +75,26 @@ async function runAccountSteps(ctx) {
     ctx.token = r.data.token;
   });
 }
+
+async function runCatalogueSteps(ctx) {
+  await step('list products with pagination', async () => {
+    const r = await call('GET', '/products?limit=50');
+    assert.equal(r.status, 200);
+    assert.ok(r.data.products.length > 0, 'No products found. Run "npm run seed" first.');
+    ctx.product = r.data.products.find((p) => p.stock >= 2);
+    assert.ok(ctx.product, 'No product with stock of at least 2');
+    ctx.stockBefore = ctx.product.stock;
+  });
+
+  await step('search, category and price filters work', async () => {
+    const { product } = ctx;
+    const keywordPath = `/products?keyword=${encodeURIComponent(product.name)}`;
+    const byKeyword = await call('GET', keywordPath);
+    assert.ok(byKeyword.data.products.some((p) => p._id === product._id));
+    const categoryPath = `/products?category=${encodeURIComponent(product.category)}`;
+    const byCategory = await call('GET', categoryPath);
+    assert.ok(byCategory.data.products.every((p) => p.category === product.category));
+    const badPrice = await call('GET', '/products?minPrice=abc');
+    assert.equal(badPrice.status, 400);
+  });
+}
