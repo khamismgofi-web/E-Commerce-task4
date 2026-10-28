@@ -30,3 +30,48 @@ async function step(name, fn) {
   passed += 1;
   console.log(`PASS  ${name}`);
 }
+
+async function runAccountSteps(ctx) {
+  const registration = { name: 'Test User', email: ctx.email, password: ctx.password };
+
+  await step('health check', async () => {
+    const r = await call('GET', '/health');
+    assert.equal(r.status, 200);
+    assert.equal(r.data.status, 'ok');
+  });
+
+  await step('register a new user', async () => {
+    const r = await call('POST', '/auth/register', registration);
+    assert.equal(r.status, 201);
+    assert.ok(r.data.token);
+    assert.equal(r.data.role, 'user');
+  });
+
+  await step('duplicate and invalid registrations are rejected', async () => {
+    const duplicate = await call('POST', '/auth/register', registration);
+    assert.equal(duplicate.status, 409);
+    const invalid = await call('POST', '/auth/register', {
+      ...registration,
+      email: 'not-an-email',
+    });
+    assert.equal(invalid.status, 400);
+  });
+
+  await step('login with a wrong password fails', async () => {
+    const r = await call('POST', '/auth/login', {
+      email: ctx.email,
+      password: 'wrong-password',
+    });
+    assert.equal(r.status, 401);
+  });
+
+  await step('login with the right password works', async () => {
+    const r = await call('POST', '/auth/login', {
+      email: ctx.email,
+      password: ctx.password,
+    });
+    assert.equal(r.status, 200);
+    assert.ok(r.data.token);
+    ctx.token = r.data.token;
+  });
+}
