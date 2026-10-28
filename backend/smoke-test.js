@@ -23,3 +23,10 @@ async function call(method, path, body, token) {
   const data = await res.json().catch(() => null);
   return { status: res.status, data };
 }
+
+let passed = 0;
+async function step(name, fn) {
+  await fn();
+  passed += 1;
+  console.log(`PASS  ${name}`);
+}
