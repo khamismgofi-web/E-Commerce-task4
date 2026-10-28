@@ -7,3 +7,4 @@ const {
   updateOrderStatus,
 } = require('../controllers/orderController');
 const { protect, adminOnly } = require('../middleware/auth');
+const router = express.Router();
