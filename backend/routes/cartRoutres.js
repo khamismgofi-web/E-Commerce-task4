@@ -7,3 +7,4 @@ const {
   clearCart,
 } = require('../controllers/cartController');
 const { protect } = require('../middleware/auth');
+const router = express.Router();
