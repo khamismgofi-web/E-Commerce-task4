@@ -224,3 +224,21 @@ async function runAdminSteps(ctx) {
     assert.equal(p.data.stock, stockBefore);
   });
 }
+
+async function main() {
+  const ctx = {
+    email: `tester_${Date.now()}@example.com`,
+    password: 'Secret123',
+    token: null,
+    product: null,
+    stockBefore: 0,
+  };
+
+  await runAccountSteps(ctx);
+  await runCatalogueSteps(ctx);
+  await runCartSteps(ctx);
+  await runOrderSteps(ctx);
+  await runAdminSteps(ctx);
+
+  console.log(`\nAll ${passed} steps passed.`);
+}
