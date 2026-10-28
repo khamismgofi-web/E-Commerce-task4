@@ -105,3 +105,26 @@ const products = [
     stock: 18,
   },
 ];
+
+const seed = async () => {
+  await connectDB();
+
+  await Product.deleteMany({});
+  await Cart.deleteMany({});
+  await Product.insertMany(products);
+
+  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@shop.com').toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
+  const existing = await User.findOne({ email: adminEmail });
+  if (!existing) {
+    await User.create({
+      name: 'Store Admin',
+      email: adminEmail,
+      password: adminPassword,
+      role: 'admin',
+    });
+  }
+
+  console.log(`Seeded ${products.length} products.`);
+  console.log(`Admin login: ${adminEmail} / ${adminPassword}`);
+};
