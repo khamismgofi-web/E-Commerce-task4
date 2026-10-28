@@ -163,3 +163,64 @@ async function runOrderSteps(ctx) {
     assert.equal(r.data.length, 1);
   });
 }
+
+async function runAdminSteps(ctx) {
+  const { product, stockBefore, token, email } = ctx;
+  let adminToken;
+  let createdId;
+
+  await step('normal users cannot manage products or orders', async () => {
+    const body = { name: 'X', price: 1, category: 'Test' };
+    const create = await call('POST', '/products', body, token);
+    assert.equal(create.status, 403);
+    const orders = await call('GET', '/orders', null, token);
+    assert.equal(orders.status, 403);
+  });
+
+  await step('admin logs in', async () => {
+    const credentials = { email: ADMIN_EMAIL, password: ADMIN_PASSWORD };
+    const r = await call('POST', '/auth/login', credentials);
+    assert.equal(r.status, 200);
+    assert.equal(r.data.role, 'admin');
+    adminToken = r.data.token;
+  });
+
+  await step('admin creates a product', async () => {
+    const body = {
+      name: 'Test Product',
+      description: 'Temporary',
+      price: 5,
+      category: 'Test',
+      stock: 3,
+    };
+    const r = await call('POST', '/products', body, adminToken);
+    assert.equal(r.status, 201);
+    createdId = r.data._id;
+  });
+
+  await step('admin updates a product', async () => {
+    const r = await call('PUT', `/products/${createdId}`, { price: 9.99 }, adminToken);
+    assert.equal(r.status, 200);
+    assert.equal(r.data.price, 9.99);
+  });
+
+  await step('admin deletes a product', async () => {
+    const r = await call('DELETE', `/products/${createdId}`, null, adminToken);
+    assert.equal(r.status, 200);
+    const check = await call('GET', `/products/${createdId}`);
+    assert.equal(check.status, 404);
+  });
+
+  await step('admin sees all orders and cancels one', async () => {
+    const all = await call('GET', '/orders', null, adminToken);
+    assert.equal(all.status, 200);
+    const mine = all.data.find((o) => o.user && o.user.email === email);
+    assert.ok(mine, 'The test order was not found in the admin list');
+    const statusPath = `/orders/${mine._id}/status`;
+    const cancel = await call('PUT', statusPath, { status: 'cancelled' }, adminToken);
+    assert.equal(cancel.status, 200);
+    assert.equal(cancel.data.status, 'cancelled');
+    const p = await call('GET', `/products/${product._id}`);
+    assert.equal(p.data.stock, stockBefore);
+  });
+}
