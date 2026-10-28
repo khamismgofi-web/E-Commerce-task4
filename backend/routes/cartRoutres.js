@@ -9,3 +9,8 @@ const {
 const { protect } = require('../middleware/auth');
 const router = express.Router();
 router.use(protect);
+router.get('/', getCart);
+router.post('/', addToCart);
+router.delete('/', clearCart);
+router.put('/:productId', updateCartItem);
+router.delete('/:productId', removeCartItem);
