@@ -128,3 +128,38 @@ async function runCartSteps(ctx) {
     assert.equal(r.data.total, roundMoney(product.price));
   });
 }
+
+async function runOrderSteps(ctx) {
+  const { product, stockBefore, token } = ctx;
+
+  await step('order needs a shipping address', async () => {
+    const r = await call('POST', '/orders', {}, token);
+    assert.equal(r.status, 400);
+  });
+
+  await step('place an order', async () => {
+    const r = await call('POST', '/orders', { shippingAddress: SHIPPING_ADDRESS }, token);
+    assert.equal(r.status, 201);
+    assert.equal(r.data.status, 'pending');
+    assert.equal(r.data.items.length, 1);
+    assert.equal(r.data.totalPrice, roundMoney(product.price));
+  });
+
+  await step('stock is reduced and the cart is emptied', async () => {
+    const p = await call('GET', `/products/${product._id}`);
+    assert.equal(p.data.stock, stockBefore - 1);
+    const cart = await call('GET', '/cart', null, token);
+    assert.equal(cart.data.items.length, 0);
+  });
+
+  await step('ordering with an empty cart is rejected', async () => {
+    const r = await call('POST', '/orders', { shippingAddress: SHIPPING_ADDRESS }, token);
+    assert.equal(r.status, 400);
+  });
+
+  await step('order appears in order history', async () => {
+    const r = await call('GET', '/orders/my', null, token);
+    assert.equal(r.status, 200);
+    assert.equal(r.data.length, 1);
+  });
+}
