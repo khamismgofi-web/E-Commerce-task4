@@ -14,3 +14,4 @@ router.get('/', adminOnly, getAllOrders);
 router.get('/my', getMyOrders);
 router.get('/:id', getOrderById);
 router.put('/:id/status', adminOnly, updateOrderStatus);
+module.exports = router;
