@@ -8,3 +8,4 @@ const {
   deleteProduct,
 } = require('../controllers/productController');
 const { protect, adminOnly } = require('../middleware/auth');
+const router = express.Router();
